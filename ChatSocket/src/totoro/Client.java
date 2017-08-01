@@ -103,6 +103,9 @@ public class Client {
 
     }
 
+    public void testGitHub(){
+        System.out.println("run GitHub !");
+    }
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Client client = new Client();
         client.connect("localhost", 7777);
