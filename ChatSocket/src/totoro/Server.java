@@ -29,14 +29,14 @@ public class Server {
     public static void main(String[] args) throws IOException {
         Server.start();
     }
-
+    // ok t hì chát vô đây nhé oke
     // lắng nghe các kết nối từ phía Client
     // khi gặp kết nối tạo ra một luồng phục vụ riêng cho mỗi Client.
     public static void start() throws IOException {
         ServerSocket socketServer = new ServerSocket(PORT);
         System.out.println("Listenning...");
         while (running) {
-            socket = socketServer.accept();
+            socket = socketServer.accept(); 
             ThreadService service = new ThreadService((socket));
             service.start();
             System.out.println("Connected!");
@@ -61,7 +61,7 @@ class ThreadService extends Thread {
     public ThreadService(Socket socket) {
         this.socket = socket;
     }
-
+    
     @Override
     public void run() {
         try {

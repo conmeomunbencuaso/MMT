@@ -14,9 +14,10 @@ import java.net.Socket;
  */
 public class Client {
 
+    // Attributes
+    
     Socket socketClient;
-    private String userName = null;
-    private String password = null;
+    Account account;
 
     public Socket getSocketClient() {
         return socketClient;
@@ -26,22 +27,24 @@ public class Client {
         this.socketClient = socketClient;
     }
 
-    public String getUserName() {
-        return userName;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
-    public String getPassword() {
-        return password;
+    public Client(Socket socketClient, Account account) {
+        this.socketClient = socketClient;
+        this.account = account;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public Client(){
+        
     }
-
+    
+    // Method
     public void connect(String address, int port) throws IOException {
         socketClient = new Socket(address, port);
     }
@@ -103,9 +106,10 @@ public class Client {
 
     }
 
-    public void testGitHub(){
+    public void testGitHub() {
         System.out.println("run GitHub !");
     }
+
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Client client = new Client();
         client.connect("localhost", 7777);

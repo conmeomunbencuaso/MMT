@@ -47,4 +47,16 @@ public class Account implements Serializable {
         this.fullName = fullName;
     }
 
+    // Danh sách hàm hành sự của lớp "Tài Khoản"
+    public void register(){
+        
+    }
+    
+    public void login(String userName, String password){
+        
+    }
+    
+    public void logOut(){
+        
+    }
 }
