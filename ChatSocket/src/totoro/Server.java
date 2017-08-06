@@ -24,7 +24,6 @@ public class Server {
     private static final int PORT = 7777;
     private static boolean running = true;
     private static Socket socket = null;
-    private ArrayList listOnline = null;
 
     public static void main(String[] args) throws IOException {
         Server.start();
