@@ -45,6 +45,11 @@ public class Client {
     }
     
     // Method
+    
+    public void sendMessage(){
+    // gửi 1 tin nhắn tới server 
+    // server gửi đi cho 1 luồng #
+    }
     public void connect(String address, int port) throws IOException {
         socketClient = new Socket(address, port);
     }
@@ -57,11 +62,11 @@ public class Client {
     public boolean registerAccount(Account act) throws IOException, ClassNotFoundException {
         boolean result = false;
         Package pagRegister = new Package(Header.REGISTER, act);
-        DataProvider dataProvider = new DataProvider(socketClient);
+        Transport transport = new Transport(socketClient);
 
-        dataProvider.sendPackage(pagRegister);
+        transport.sendPackage(pagRegister);
 
-        Package pagServer = dataProvider.recivePackage();
+        Package pagServer = transport.recivePackage();
         if (pagServer.getHeader() == Header.REGISTER) {
             result = (boolean) pagServer.getData();
         }
@@ -75,11 +80,11 @@ public class Client {
         String pagData = userName + "," + password;
         Package pagLogin = new Package(Header.LOGIN, pagData);
 
-        DataProvider dataProvider = new DataProvider(socketClient);
-        dataProvider.sendPackage(pagLogin);
+        Transport transport = new Transport(socketClient);
+        transport.sendPackage(pagLogin);
 
         // nhận thông tin đăng nhập hợp lệ: không hợp lệ ?
-        Package pagServer = dataProvider.recivePackage();
+        Package pagServer = transport.recivePackage();
         if (pagServer.getHeader() == Header.LOGIN) {
             result = (boolean) pagServer.getData();
         }
@@ -91,10 +96,10 @@ public class Client {
         int out = -1;
         Package pagLogout = new Package(Header.LOGOUT, out);
 
-        DataProvider dataProvider = new DataProvider(socketClient);
-        dataProvider.sendPackage(pagLogout);
+        Transport transport = new Transport(socketClient);
+        transport.sendPackage(pagLogout);
 
-        dataProvider.recivePackage();
+        transport.recivePackage();
         return false;
     }
 

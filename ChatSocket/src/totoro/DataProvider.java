@@ -5,36 +5,44 @@
  */
 package totoro;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Totoro
  */
 public class DataProvider {
-
-    private Socket socket;
-    private ObjectOutputStream send;
-    private ObjectInputStream recive;
-
-    public DataProvider(Socket socket) {
-        this.socket = socket;
+    //JDBC Driver for MS SQL Server 2014
+    private final String driverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    private final String connectionString = "jdbc:sqlserver://localhost:1433;databaseName=ChatSocket;user=sa;password=123456";
+    private Connection connection = null;
+    
+    // Data Access Object
+    public void connect() {
+        try {
+            Class.forName(driverName);
+            connection = DriverManager.getConnection(connectionString);
+            if (connection != null) {
+                //Logger.getLogger("connected");
+                System.out.println("connected to database");
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error Message", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(e.toString());
+        }
     }
-    // send a package through network
-    public void sendPackage(Package pag) throws IOException {
-        ObjectOutputStream sendToServer = new ObjectOutputStream(socket.getOutputStream());
-        sendToServer.writeObject(pag);
-        sendToServer.flush();
-    }
 
-    // recive a package through network
-    public Package recivePackage() throws IOException, ClassNotFoundException {
-        Package pag = new Package();
-        ObjectInputStream reciveFromServer = new ObjectInputStream(socket.getInputStream());
-        pag = (Package) reciveFromServer.readObject();
-        return pag;
+    public void disConnect() {
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Transport.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

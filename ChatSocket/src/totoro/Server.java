@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 enum Header {
@@ -23,19 +24,33 @@ public class Server {
 
     private static final int PORT = 7777;
     private static boolean running = true;
+    private static ServerSocket socketServer = null;
     private static Socket socket = null;
 
     public static void main(String[] args) throws IOException {
-        Server.start();
+        DataProvider dataProvider = new DataProvider();
+        dataProvider.connect();
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Server.start();
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        }).start();
     }
-    // ok t hì chát vô đây nhé oke
+
     // lắng nghe các kết nối từ phía Client
     // khi gặp kết nối tạo ra một luồng phục vụ riêng cho mỗi Client.
     public static void start() throws IOException {
-        ServerSocket socketServer = new ServerSocket(PORT);
+        socketServer = new ServerSocket(PORT);
         System.out.println("Listenning...");
         while (running) {
-            socket = socketServer.accept(); 
+            socket = socketServer.accept();
             ThreadService service = new ThreadService((socket));
             service.start();
             System.out.println("Connected!");
@@ -43,7 +58,12 @@ public class Server {
     }
 
     public static void stop() {
-        running = false;
+        try {
+            socketServer.close();
+            running = false;
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
 
@@ -55,18 +75,18 @@ class ThreadService extends Thread {
 
     private Socket socket = null;
     private ArrayList<Account> listOfAccount = null;
-    DataProvider dataProvider;
+    Transport transport;
 
     public ThreadService(Socket socket) {
         this.socket = socket;
     }
-    
+
     @Override
     public void run() {
         try {
-            dataProvider = new DataProvider(socket);
+            transport = new Transport(socket);
             while (true) {
-                Package pagClient = (Package) dataProvider.recivePackage();
+                Package pagClient = (Package) transport.recivePackage();
                 if (null != pagClient.getHeader()) {
                     switch (pagClient.getHeader()) {
                         // create account for label REGISTER
@@ -75,19 +95,19 @@ class ThreadService extends Thread {
                             boolean resultRegister = createAccount(act);
 
                             Package pagRegister = new Package(Header.REGISTER, resultRegister);
-                            dataProvider.sendPackage(pagRegister);
+                            transport.sendPackage(pagRegister);
                             break;
                         // check account for label LOGIN
                         case LOGIN:
                             String strLog = (String) pagClient.getData();
                             String[] login = strLog.split(",");
 
-                            String userName = login[0].toString();
-                            String password = login[1].toString();
+                            String userName = login[0];
+                            String password = login[1];
 
                             boolean resultLogin = checkLogin(userName, password);
                             Package pagLogin = new Package(Header.LOGIN, resultLogin);
-                            dataProvider.sendPackage(pagLogin);
+                            transport.sendPackage(pagLogin);
                             break;
                         case LOGOUT:
                             // input: Header.OUTPUT
